@@ -1,4 +1,4 @@
-package io.github.luca_bn.habit_tracker;
+package io.github.lucabn.habittracker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
