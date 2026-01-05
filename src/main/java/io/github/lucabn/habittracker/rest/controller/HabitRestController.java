@@ -1,5 +1,10 @@
 package io.github.lucabn.habittracker.rest.controller;
 
+import io.github.lucabn.habittracker.entity.Habit;
+import io.github.lucabn.habittracker.entity.HabitLog;
+import io.github.lucabn.habittracker.repository.HabitLogRepository;
+import io.github.lucabn.habittracker.repository.HabitRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,38 +14,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@AllArgsConstructor
 @RestController
-@RequestMapping("/v1/habit")
+@RequestMapping("/api/v1/habits")
 public class HabitRestController {
 
-  @PostMapping("/create")
-  public String create(@RequestBody Object habit) {
+  private final HabitRepository habitRepository;
+  private final HabitLogRepository habitLogRepository;
+
+  @PostMapping
+  public Habit create(@RequestBody Habit habit) {
+    return habitRepository.save(habit);
+  }
+
+  @PutMapping
+  public Habit update(@RequestBody Habit habit) {
+    return habitRepository.save(habit);
+  }
+
+  @DeleteMapping("/{habit-id}")
+  public String delete(@PathVariable("habit-id") Long habitId) {
+    habitRepository.deleteById(habitId);
     return "OK";
   }
 
-  @PutMapping("/update")
-  public String update(@RequestBody Object habit) {
-    return "OK";
+  @PutMapping("/log")
+  public HabitLog createLog(@RequestBody HabitLog log) {
+    return habitLogRepository.save(log);
   }
 
-  @DeleteMapping("/delete")
-  public String delete(@RequestBody Object habit) {
-    return "OK";
-  }
-
-  @PostMapping("/status")
-  public String updateStatus(@RequestBody Object habit) {
-    return "OK";
-  }
-
-  @GetMapping("/{habit-id}/status")
-  public String getHistory(@PathVariable("habit-id") String habitId) {
-    return habitId;
+  @GetMapping("/{habit-id}/logs")
+  public Iterable<HabitLog> getHistory(@PathVariable("habit-id") long habitId) {
+    return habitLogRepository.findByHabit_Id(habitId);
   }
 
   @GetMapping("/all")
-  public String getAll() {
-    return "OK";
+  public Iterable<Habit> getAll() {
+    return habitRepository.findAll();
   }
 
 }
