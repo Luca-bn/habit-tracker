@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HabitLogRepository extends CrudRepository<HabitLog, Long> {
 
-  Iterable<HabitLog> findByHabit_Id(long habitId);
+  Iterable<HabitLog> findByHabitId(long habitId);
 
 }

@@ -2,6 +2,7 @@ package io.github.lucabn.habittracker.rest.controller;
 
 import io.github.lucabn.habittracker.entity.User;
 import io.github.lucabn.habittracker.repository.UserRepository;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,15 @@ public class UserRestController {
 
   @PutMapping
   public User update(@RequestBody User user) {
-    return userRepository.save(user);
+    User entity = userRepository.findById(user.getId()).orElseThrow();
+    entity.setId(user.getId());
+    entity.setActive(user.isActive());
+    entity.setPswHash(user.getPswHash());
+    entity.setEmail(user.getEmail());
+    entity.setUsername(user.getUsername());
+    entity.setCreatedAt(user.getCreatedAt());
+    entity.setUpdatedAt(LocalDateTime.now());
+    return userRepository.save(entity);
   }
 
   @DeleteMapping("/{user-id}")

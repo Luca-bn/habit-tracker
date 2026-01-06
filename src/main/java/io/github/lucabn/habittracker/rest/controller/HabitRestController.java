@@ -4,6 +4,9 @@ import io.github.lucabn.habittracker.entity.Habit;
 import io.github.lucabn.habittracker.entity.HabitLog;
 import io.github.lucabn.habittracker.repository.HabitLogRepository;
 import io.github.lucabn.habittracker.repository.HabitRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +27,21 @@ public class HabitRestController {
 
   @PostMapping
   public Habit create(@RequestBody Habit habit) {
+    Stream.ofNullable(habit.getAdditionalData()).flatMap(List::stream)
+        .forEach(habitAdditionalData ->
+            habitAdditionalData.setHabit(habit));
     return habitRepository.save(habit);
   }
 
   @PutMapping
   public Habit update(@RequestBody Habit habit) {
-    return habitRepository.save(habit);
+    Habit entity = habitRepository.findById(habit.getId()).orElseThrow();
+    entity.setDescription(habit.getDescription());
+    entity.setCategory(habit.getCategory());
+    entity.setAdditionalData(Stream.ofNullable(habit.getAdditionalData()).flatMap(List::stream)
+        .peek(habitAdditionalData -> habitAdditionalData.setHabit(entity))
+        .collect(Collectors.toList()));
+    return habitRepository.save(entity);
   }
 
   @DeleteMapping("/{habit-id}")
@@ -45,7 +57,7 @@ public class HabitRestController {
 
   @GetMapping("/{habit-id}/logs")
   public Iterable<HabitLog> getHistory(@PathVariable("habit-id") long habitId) {
-    return habitLogRepository.findByHabit_Id(habitId);
+    return habitLogRepository.findByHabitId(habitId);
   }
 
   @GetMapping("/all")
