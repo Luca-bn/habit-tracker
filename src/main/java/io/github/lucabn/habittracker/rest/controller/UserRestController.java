@@ -1,8 +1,8 @@
 package io.github.lucabn.habittracker.rest.controller;
 
-import io.github.lucabn.habittracker.entity.User;
-import io.github.lucabn.habittracker.repository.UserRepository;
-import java.time.LocalDateTime;
+import io.github.lucabn.habittracker.dto.UserDTO;
+import io.github.lucabn.habittracker.service.UserService;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,39 +18,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/users")
 public class UserRestController {
 
-  private final UserRepository userRepository;
+  private final UserService userService;
 
   @GetMapping("/{user-id}")
-  public User getUser(@PathVariable("user-id") Long userId) {
-    return userRepository.findById(userId).orElse(null);
+  public UserDTO getUser(@PathVariable("user-id") Long userId) throws Exception {
+    return userService.findUser(userId);
   }
 
   @GetMapping("/all")
-  public Iterable<User> getUsers() {
-    return userRepository.findAll();
+  public List<UserDTO> getUsers() {
+    return userService.findUsers();
   }
 
   @PostMapping
-  public User create(@RequestBody User user) {
-    return userRepository.save(user);
+  public UserDTO create(@RequestBody UserDTO user) {
+    return userService.createUser(user);
   }
 
   @PutMapping
-  public User update(@RequestBody User user) {
-    User entity = userRepository.findById(user.getId()).orElseThrow();
-    entity.setId(user.getId());
-    entity.setActive(user.isActive());
-    entity.setPswHash(user.getPswHash());
-    entity.setEmail(user.getEmail());
-    entity.setUsername(user.getUsername());
-    entity.setCreatedAt(user.getCreatedAt());
-    entity.setUpdatedAt(LocalDateTime.now());
-    return userRepository.save(entity);
+  public UserDTO update(@RequestBody UserDTO user) throws Exception {
+    return userService.updateUser(user);
   }
 
   @DeleteMapping("/{user-id}")
   public String delete(@PathVariable("user-id") Long userId) {
-    userRepository.deleteById(userId);
+    userService.deleteUser(userId);
     return "OK";
   }
 
