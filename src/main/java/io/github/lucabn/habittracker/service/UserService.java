@@ -3,6 +3,7 @@ package io.github.lucabn.habittracker.service;
 import io.github.lucabn.habittracker.dto.UserDTO;
 import io.github.lucabn.habittracker.entity.User;
 import io.github.lucabn.habittracker.exception.InvalidParametersException;
+import io.github.lucabn.habittracker.mapper.EntityMappers.UserMapper;
 import io.github.lucabn.habittracker.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,12 +16,10 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
   public UserDTO createUser(UserDTO user) {
-    User entity = new User();
-    entity.setEmail(user.getEmail());
-    entity.setUsername(user.getUsername());
-    entity.setPswHash(user.getPswHash());
+    User entity = userMapper.toEntity(user);
     entity.setActive(true);
     entity.setCreatedAt(LocalDateTime.now());
     entity.setUpdatedAt(LocalDateTime.now());
@@ -39,7 +38,7 @@ public class UserService {
     entity.setActive(true);
     entity.setUpdatedAt(LocalDateTime.now());
     userRepository.save(entity);
-    return user;
+    return userMapper.toDTO(entity);
   }
 
   public void deleteUser(Long userId) {
@@ -49,24 +48,12 @@ public class UserService {
   public UserDTO findUser(Long userId) throws Exception {
     User entity = userRepository.findById(userId).orElseThrow(() -> new InvalidParametersException(
         String.format("user id [%s] not found", userId)));
-    return UserDTO.builder()
-        .id(entity.getId())
-        .username(entity.getUsername())
-        .email(entity.getEmail())
-        .pswHash(entity.getPswHash())
-        .build();
+    return userMapper.toDTO(entity);
   }
 
   public List<UserDTO> findUsers() {
     return StreamSupport.stream(userRepository.findAll().spliterator(), false)
-        .map(
-            entity -> UserDTO.builder()
-                .id(entity.getId())
-                .username(entity.getUsername())
-                .email(entity.getEmail())
-                .pswHash(entity.getPswHash())
-                .build()
-        ).toList();
+        .map(userMapper::toDTO).toList();
   }
 
 }
