@@ -1,5 +1,6 @@
 package io.github.lucabn.habittracker.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class HabitDTO {
 
   private Long id;
+  @NotBlank(message = "description cannot be empty")
   private String description;
   private String category;
   private Long userId;
