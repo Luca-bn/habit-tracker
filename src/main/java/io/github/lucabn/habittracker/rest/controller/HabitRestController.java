@@ -37,7 +37,7 @@ public class HabitRestController {
     return "OK";
   }
 
-  @PutMapping("/log")
+  @PostMapping("/log")
   public HabitLogDTO createLog(@RequestBody HabitLogDTO log) {
     return habitService.createLog(log);
   }
